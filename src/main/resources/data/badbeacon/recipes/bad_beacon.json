@@ -1,0 +1,23 @@
+{
+  "result": {
+    "item": "badbeacon:bad_beacon",
+    "count": 3
+  },
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "G#G",
+    "BBB"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:heart_of_the_sea"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "B": {
+      "item": "minecraft:nether_wart_block"
+    }
+  }
+}

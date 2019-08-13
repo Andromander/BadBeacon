@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "badbeacon:block/bad_beacon"
+    }
+  }
+}
