@@ -62,7 +62,7 @@ public class BadBeaconMod {
     }
 
     public void clientSetup(final FMLClientSetupEvent e) {
-        ClientRegistry.bindTileEntitySpecialRenderer(BadBeaconTileEntity.class, new BadBeaconTileEntityRenderer());
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> BadBeaconMod::registerBinds);
     }
 
     @SubscribeEvent
@@ -92,6 +92,11 @@ public class BadBeaconMod {
     @OnlyIn(Dist.CLIENT)
     public static void registerScreen() {
         ScreenManager.registerFactory(BAD_BEACON_CONTAINER, BadBeaconScreen::new);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void registerBinds() {
+        ClientRegistry.bindTileEntitySpecialRenderer(BadBeaconTileEntity.class, new BadBeaconTileEntityRenderer());
     }
 
     public static class BadBeaconConfig {
