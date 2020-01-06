@@ -9,7 +9,7 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
 
     public BadBeaconBlock() {
-        super(Properties.create(Material.GLASS, MaterialColor.BLUE).hardnessAndResistance(0.3F).lightValue(15));
+        super(Properties.create(Material.GLASS, MaterialColor.BLUE).hardnessAndResistance(0.3F).lightValue(15).func_226896_b_());
     }
 
     @Override
@@ -47,26 +47,20 @@ public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
 
     @Override
     @Deprecated
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if (!worldIn.isRemote) {
             TileEntity tileentity = worldIn.getTileEntity(pos);
             if (tileentity instanceof BadBeaconTileEntity) {
                 player.openContainer((BadBeaconTileEntity) tileentity);
             }
         }
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     @Override
     @Deprecated
     public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return false;
-    }
-
-    @Override
-    @Deprecated
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
     }
 
     @Override
@@ -79,10 +73,10 @@ public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
         }
     }
 
-    @Override
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
+//    @Override
+//    public BlockRenderLayer getRenderLayer() {
+//        return BlockRenderLayer.CUTOUT;
+//    }
 
     @Nullable
     @Override

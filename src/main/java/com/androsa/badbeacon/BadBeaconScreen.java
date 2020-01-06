@@ -1,12 +1,10 @@
 package com.androsa.badbeacon;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
@@ -116,7 +114,6 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        RenderHelper.disableStandardItemLighting();
         this.drawCenteredString(this.font, I18n.format("block.minecraft.beacon.primary"), 62, 10, 14737632);
         this.drawCenteredString(this.font, I18n.format("block.minecraft.beacon.secondary"), 169, 10, 14737632);
 
@@ -126,13 +123,11 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
                 break;
             }
         }
-
-        RenderHelper.enableGUIStandardItemLighting();
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         if (this.minecraft != null) {
             this.minecraft.getTextureManager().bindTexture(BEACON_GUI_TEXTURES);
         }
@@ -164,7 +159,7 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
 
         public void renderButton(int backX, int backY, float partial) {
             Minecraft.getInstance().getTextureManager().bindTexture(BadBeaconScreen.BEACON_GUI_TEXTURES);
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             int j = 0;
             if (!this.active) {
                 j += this.width * 2;
@@ -230,8 +225,8 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
 
         @Override
         protected void blitButton() {
-            Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_EFFECTS_TEXTURE);
-            blit(this.x + 2, this.y + 2, this.blitOffset, 18, 18, this.textureSprite);
+            Minecraft.getInstance().getTextureManager().bindTexture(textureSprite.func_229241_m_().func_229223_g_());
+            blit(this.x + 2, this.y + 2, this.getBlitOffset(), 18, 18, this.textureSprite);
         }
     }
 

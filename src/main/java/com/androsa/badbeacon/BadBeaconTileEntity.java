@@ -87,7 +87,7 @@ public class BadBeaconTileEntity extends TileEntity implements INamedContainerPr
     };
 
     public BadBeaconTileEntity() {
-        super(BadBeaconMod.BAD_BEACON_TILEENTITY);
+        super(BadBeaconMod.BAD_BEACON_TILEENTITY.get());
     }
 
     @Override

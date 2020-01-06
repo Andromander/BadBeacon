@@ -34,7 +34,7 @@ public class BadBeaconContainer extends Container {
     }
 
     public BadBeaconContainer(int id, IInventory inventory, IIntArray array, IWorldPosCallable worldPos) {
-        super(BadBeaconMod.BAD_BEACON_CONTAINER, id);
+        super(BadBeaconMod.BAD_BEACON_CONTAINER.get(), id);
         assertIntArraySize(array, 3);
         this.intArray = array;
         this.worldPos = worldPos;
@@ -66,7 +66,7 @@ public class BadBeaconContainer extends Container {
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
-        return isWithinUsableDistance(this.worldPos, playerIn, BadBeaconMod.BAD_BEACON);
+        return isWithinUsableDistance(this.worldPos, playerIn, BadBeaconMod.BAD_BEACON.get());
     }
 
     @Override

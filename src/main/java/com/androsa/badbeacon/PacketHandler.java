@@ -5,13 +5,13 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class PacketHandler {
-    private static final String PROTOCOL_VERSION = Integer.toString(1);
-    private static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation("badbeacon", "main_channel"))
-            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .simpleChannel();
+    private static final String PROTOCOL_VERSION = "1";
+    private static final SimpleChannel HANDLER = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation("badbeacon", "main_channel"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
+    );
 
     public static void register() {
         HANDLER.registerMessage(0, CUpdateBadBeaconPacket.class, CUpdateBadBeaconPacket::encode, CUpdateBadBeaconPacket::decode, CUpdateBadBeaconPacket.Handler::handle);
