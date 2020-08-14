@@ -275,12 +275,13 @@ public class BadBeaconTileEntity extends TileEntity implements INamedContainerPr
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void read(BlockState state, CompoundNBT compound) {
+        super.read(state, compound);
         this.primaryEffect = isBeaconEffect(compound.getInt("Primary"));
         this.secondaryEffect = isBeaconEffect(compound.getInt("Secondary"));
         if (compound.contains("CustomName", 8)) {
-            this.customName = ITextComponent.Serializer.fromJson(compound.getString("CustomName"));
+            //fromJson
+            this.customName = ITextComponent.Serializer.func_240643_a_(compound.getString("CustomName"));
         }
 
         this.lock = LockCode.read(compound);

@@ -20,20 +20,20 @@ public class BadBeaconTileEntityRenderer extends TileEntityRenderer<BadBeaconTil
     }
 
     @Override
-    public void func_225616_a_(BadBeaconTileEntity tileEntityIn, float p_225616_2_, MatrixStack p_225616_3_, IRenderTypeBuffer p_225616_4_, int partialTicks, int destroyStage) {
-        long i = tileEntityIn.getWorld().getGameTime();
-        List<BadBeaconTileEntity.BeamSegment> list = tileEntityIn.getBeamSegments();
-        int j = 0;
+    public void render(BadBeaconTileEntity tileEntityIn, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int light, int destroyStage) {
+        long time = tileEntityIn.getWorld().getGameTime();
+        List<BadBeaconTileEntity.BeamSegment> segments = tileEntityIn.getBeamSegments();
+        int height = 0;
 
-        for(int k = 0; k < list.size(); ++k) {
-            BadBeaconTileEntity.BeamSegment beacontileentity$beamsegment = list.get(k);
-            renderSegments(p_225616_3_, p_225616_4_, p_225616_2_, i, j, k == list.size() - 1 ? 1024 : beacontileentity$beamsegment.getHeight(), beacontileentity$beamsegment.getColors());
-            j += beacontileentity$beamsegment.getHeight();
+        for(int segment = 0; segment < segments.size(); ++segment) {
+            BadBeaconTileEntity.BeamSegment beacontileentity$beamsegment = segments.get(segment);
+            renderSegments(stack, buffer, partialTicks, time, height, segment == segments.size() - 1 ? 1024 : beacontileentity$beamsegment.getHeight(), beacontileentity$beamsegment.getColors());
+            height += beacontileentity$beamsegment.getHeight();
         }
     }
 
-    private static void renderSegments(MatrixStack matrix, IRenderTypeBuffer buffer, float p_228841_2_, long p_228841_3_, int p_228841_5_, int p_228841_6_, float[] p_228841_7_) {
-        BeaconTileEntityRenderer.func_228842_a_(matrix, buffer, TEXTURE_BEACON_BEAM, p_228841_2_, 1.0F, p_228841_3_, p_228841_5_, p_228841_6_, p_228841_7_, 0.2F, 0.25F);
+    private static void renderSegments(MatrixStack matrix, IRenderTypeBuffer buffer, float partialTicks, long time, int height, int segment, float[] colours) {
+        BeaconTileEntityRenderer.renderBeamSegment(matrix, buffer, TEXTURE_BEACON_BEAM, partialTicks, 1.0F, time, height, segment, colours, 0.2F, 0.25F);
     }
 
     @Override

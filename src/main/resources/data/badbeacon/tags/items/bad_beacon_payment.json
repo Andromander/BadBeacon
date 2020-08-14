@@ -4,6 +4,7 @@
     "minecraft:redstone",
     "minecraft:coal",
     "minecraft:lapis_lazuli",
-    "minecraft:quartz"
+    "minecraft:quartz",
+    "minecraft:bone"
   ]
 }

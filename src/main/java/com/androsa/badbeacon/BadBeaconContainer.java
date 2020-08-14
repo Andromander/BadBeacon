@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 public class BadBeaconContainer extends Container {
     private final IInventory tileBeacon = new Inventory(1) {
         public boolean isItemValidForSlot(int index, ItemStack stack) {
-            return stack.isBeaconPayment();
+            return stack.getItem().isIn(BadBeaconMod.BAD_BEACON_PAYMENT);
         }
 
         public int getInventoryStackLimit() {

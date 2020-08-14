@@ -4,6 +4,7 @@
     "minecraft:redstone_block",
     "minecraft:coal_block",
     "minecraft:lapis_block",
-    "minecraft:quartz_block"
+    "minecraft:quartz_block",
+    "minecraft:bone_block"
   ]
 }

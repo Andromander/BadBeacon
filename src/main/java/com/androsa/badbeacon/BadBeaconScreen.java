@@ -1,7 +1,9 @@
 package com.androsa.badbeacon;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
@@ -17,7 +19,10 @@ import net.minecraft.potion.Effect;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -113,40 +118,39 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.drawCenteredString(this.font, I18n.format("block.minecraft.beacon.primary"), 62, 10, 14737632);
-        this.drawCenteredString(this.font, I18n.format("block.minecraft.beacon.secondary"), 169, 10, 14737632);
+    protected void drawGuiContainerForegroundLayer(MatrixStack stack, int mouseX, int mouseY) {
+        drawCenteredString(stack, this.font, I18n.format("block.minecraft.beacon.primary"), 62, 10, 14737632);
+        drawCenteredString(stack, this.font, I18n.format("block.minecraft.beacon.secondary"), 169, 10, 14737632);
 
         for(Widget widget : this.buttons) {
             if (widget.isHovered()) {
-                widget.renderToolTip(mouseX - this.guiLeft, mouseY - this.guiTop);
+                widget.renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
                 break;
             }
         }
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(MatrixStack stack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        if (this.minecraft != null) {
-            this.minecraft.getTextureManager().bindTexture(BEACON_GUI_TEXTURES);
-        }
-        int level = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.blit(level, j, 0, 0, this.xSize, this.ySize);
+        this.minecraft.getTextureManager().bindTexture(BEACON_GUI_TEXTURES);
+        int x = (this.width - this.xSize) / 2;
+        int y = (this.height - this.ySize) / 2;
+        this.blit(stack, x, y, 0, 0, this.xSize, this.ySize);
         this.itemRenderer.zLevel = 100.0F;
-        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.COAL), level + 42, j + 109);
-        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.LAPIS_LAZULI), level + 42 + 22, j + 109);
-        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.REDSTONE), level + 42 + 44, j + 109);
-        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.QUARTZ), level + 42 + 66, j + 109);
+        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.BONE), x + 20, y + 109);
+        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.COAL), x + 41, y + 109);
+        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
+        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
+        this.itemRenderer.renderItemAndEffectIntoGUI(new ItemStack(Items.QUARTZ), x + 42 + 66, y + 109);
         this.itemRenderer.zLevel = 0.0F;
     }
 
     @Override
-    public void render(int mouseX, int mouseZ, float ticks) {
-        this.renderBackground();
-        super.render(mouseX, mouseZ, ticks);
-        this.renderHoveredToolTip(mouseX, mouseZ);
+    public void render(MatrixStack stack, int mouseX, int mouseZ, float ticks) {
+        this.renderBackground(stack);
+        super.render(stack, mouseX, mouseZ, ticks);
+        this.func_230459_a_(stack, mouseX, mouseZ); //renderHoveredToolTip
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -154,10 +158,11 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
         private boolean selected;
 
         protected Button(int x, int y) {
-            super(x, y, 22, 22, "");
+            super(x, y, 22, 22, StringTextComponent.EMPTY);
         }
 
-        public void renderButton(int backX, int backY, float partial) {
+        @Override
+        public void renderButton(MatrixStack stack, int backX, int backY, float partial) {
             Minecraft.getInstance().getTextureManager().bindTexture(BadBeaconScreen.BEACON_GUI_TEXTURES);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             int j = 0;
@@ -169,11 +174,11 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
                 j += this.width * 3;
             }
 
-            this.blit(this.x, this.y, j, 219, this.width, this.height);
-            this.blitButton();
+            this.blit(stack, this.x, this.y, j, 219, this.width, this.height);
+            this.blitButton(stack);
         }
 
-        protected abstract void blitButton();
+        protected abstract void blitButton(MatrixStack stack);
 
         public boolean isSelected() {
             return this.selected;
@@ -214,19 +219,19 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
         }
 
         @Override
-        public void renderToolTip(int x, int y) {
-            String effectname = I18n.format(this.effect.getName());
+        public void renderToolTip(MatrixStack stack, int x, int y) {
+            IFormattableTextComponent effectname = new TranslationTextComponent(this.effect.getName());
             if (!this.isPrimary && this.effect != Effects.POISON) {
-                effectname = effectname + " II";
+                effectname.appendString(" II");
             }
 
-            BadBeaconScreen.this.renderTooltip(effectname, x, y);
+            BadBeaconScreen.this.renderTooltip(stack, effectname, x, y);
         }
 
         @Override
-        protected void blitButton() {
-            Minecraft.getInstance().getTextureManager().bindTexture(textureSprite.func_229241_m_().func_229223_g_());
-            blit(this.x + 2, this.y + 2, this.getBlitOffset(), 18, 18, this.textureSprite);
+        protected void blitButton(MatrixStack stack) {
+            Minecraft.getInstance().getTextureManager().bindTexture(textureSprite.getAtlasTexture().getTextureLocation());
+            blit(stack, this.x + 2, this.y + 2, this.getBlitOffset(), 18, 18, this.textureSprite);
         }
     }
 
@@ -242,8 +247,8 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
         }
 
         @Override
-        protected void blitButton() {
-            this.blit(this.x + 2, this.y + 2, this.field_212948_a, this.field_212949_b, 18, 18);
+        protected void blitButton(MatrixStack stack) {
+            this.blit(stack, this.x + 2, this.y + 2, this.field_212948_a, this.field_212949_b, 18, 18);
         }
     }
 
@@ -261,8 +266,8 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
         }
 
         @Override
-        public void renderToolTip(int x, int y) {
-            BadBeaconScreen.this.renderTooltip(I18n.format("gui.done"), x, y);
+        public void renderToolTip(MatrixStack stack, int x, int y) {
+            BadBeaconScreen.this.renderTooltip(stack, DialogTexts.field_240632_c_, x, y);
         }
     }
 
@@ -272,13 +277,15 @@ public class BadBeaconScreen extends ContainerScreen<BadBeaconContainer> {
             super(x, y, 112, 220);
         }
 
+        @Override
         public void onPress() {
             BadBeaconScreen.this.minecraft.player.connection.sendPacket(new CCloseWindowPacket(BadBeaconScreen.this.minecraft.player.openContainer.windowId));
             BadBeaconScreen.this.minecraft.displayGuiScreen(null);
         }
 
-        public void renderToolTip(int x, int y) {
-            BadBeaconScreen.this.renderTooltip(I18n.format("gui.cancel"), x, y);
+        @Override
+        public void renderToolTip(MatrixStack stack, int x, int y) {
+            BadBeaconScreen.this.renderTooltip(stack, DialogTexts.field_240633_d_, x, y);
         }
     }
 }

@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
 
     public BadBeaconBlock() {
-        super(Properties.create(Material.GLASS, MaterialColor.BLUE).hardnessAndResistance(0.3F).lightValue(15).func_226896_b_());
+        super(Properties.create(Material.GLASS, MaterialColor.BLUE).hardnessAndResistance(0.3F).setLightLevel((val) -> 15).notSolid());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
 
     @Override
     @Deprecated
-    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if (!worldIn.isRemote) {
             TileEntity tileentity = worldIn.getTileEntity(pos);
             if (tileentity instanceof BadBeaconTileEntity) {
@@ -55,12 +55,6 @@ public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
             }
         }
         return ActionResultType.SUCCESS;
-    }
-
-    @Override
-    @Deprecated
-    public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        return false;
     }
 
     @Override
@@ -72,11 +66,6 @@ public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
             }
         }
     }
-
-//    @Override
-//    public BlockRenderLayer getRenderLayer() {
-//        return BlockRenderLayer.CUTOUT;
-//    }
 
     @Nullable
     @Override

@@ -10,16 +10,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Rarity;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -40,13 +38,13 @@ public class BadBeaconMod {
     private static final Logger LOGGER = LogManager.getLogger();
     public static BadBeaconConfig config;
 
-    public static final Tag<Block> BAD_BEACON_BASE = new BlockTags.Wrapper(new ResourceLocation("badbeacon", "bad_beacon_base"));
-    public static final Tag<Item> BAD_BEACON_PAYMENT = new ItemTags.Wrapper(new ResourceLocation("badbeacon", "bad_beacon_payment"));
+    public static final ITag.INamedTag<Block> BAD_BEACON_BASE = BlockTags.makeWrapperTag("badbeacon:bad_beacon_base");
+    public static final ITag.INamedTag<Item> BAD_BEACON_PAYMENT = ItemTags.makeWrapperTag("badbeacon:bad_beacon_payment");
 
-    public static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, MODID);
-    public static final DeferredRegister<Item> ITEMS = new DeferredRegister<>(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, MODID);
-    public static final DeferredRegister<ContainerType<?>> CONTAINERS = new DeferredRegister<>(ForgeRegistries.CONTAINERS, MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
+    public static final DeferredRegister<ContainerType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
 
     public static final RegistryObject<Block> BAD_BEACON = BLOCKS.register("bad_beacon", BadBeaconBlock::new);
     public static final RegistryObject<Item> BAD_BEACON_ITEM = ITEMS.register("bad_beacon", () -> new BlockItem(BAD_BEACON.get(), new Item.Properties().group(ItemGroup.MISC).rarity(Rarity.RARE)));
@@ -69,12 +67,12 @@ public class BadBeaconMod {
     }
 
     public void setup(FMLCommonSetupEvent e) {
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> BadBeaconMod::registerScreen);
         DeferredWorkQueue.runLater(PacketHandler::register);
     }
 
     public void clientSetup(final FMLClientSetupEvent e) {
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> BadBeaconMod::registerBinds);
+        BadBeaconMod.registerScreen();
+        BadBeaconMod.registerBinds();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -84,7 +82,7 @@ public class BadBeaconMod {
 
     @OnlyIn(Dist.CLIENT)
     public static void registerBinds() {
-        RenderTypeLookup.setRenderLayer(BAD_BEACON.get(), RenderType.func_228643_e_());
+        RenderTypeLookup.setRenderLayer(BAD_BEACON.get(), RenderType.getCutout());
         ClientRegistry.bindTileEntityRenderer(BAD_BEACON_TILEENTITY.get(), BadBeaconTileEntityRenderer::new);
     }
 

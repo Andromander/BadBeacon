@@ -1,10 +1,11 @@
 modLoader="javafml" #mandatory
-loaderVersion="[30,)" #mandatory (24 is current forge version)
+loaderVersion="[33,)" #mandatory (24 is current forge version)
 
 issueTrackerURL="https://github.com/Andromander/BadBeacon/issues" #optional
 displayURL="https://www.curseforge.com/minecraft/mc-mods/bad-beacon" #optional
 credits="Credit to the culmination of tiny ideas" #optional
 authors="Androsa" #optional
+license="MIT License"
 
 [[mods]] #mandatory
 modId="badbeacon" #mandatory
@@ -13,20 +14,20 @@ displayName="Bad Beacon" #mandatory
 description='''
 Imagine making a Beacon one day, but instead of a Nether Star and some Obsidian, you substitute it for a Heart of the Sea and some Nether Wart Blocks.
 
-In comes the Bad Beacon. A block with a purple light, red base, a black beam of light, and the negative effects that come with it. Build the base of Coal, Lapis Lazuli, Redstone, or Nether Quartz, and pay with those similar items.
+In comes the Bad Beacon. A block with a purple light, red base, a black beam of light, and the negative effects that come with it. Build the base of Coal, Lapis Lazuli, Redstone, Nether Quartz, or Bone and pay with those similar items.
 Affect everyone or just the players. Add some blocks and payment methods with a datapack.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.badbeacon]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
-    versionRange="[30,)" #mandatory
+    versionRange="[33,)" #mandatory
     ordering="NONE"
     side="BOTH"
 # Here's another dependency
 [[dependencies.badbeacon]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.1,]"
+    versionRange="[1.16.2,]"
     ordering="NONE"
     side="BOTH"
