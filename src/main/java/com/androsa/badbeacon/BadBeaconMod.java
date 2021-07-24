@@ -1,31 +1,30 @@
 package com.androsa.badbeacon;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Rarity;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,27 +37,27 @@ public class BadBeaconMod {
     private static final Logger LOGGER = LogManager.getLogger();
     public static BadBeaconConfig config;
 
-    public static final ITag.INamedTag<Block> BAD_BEACON_BASE = BlockTags.makeWrapperTag("badbeacon:bad_beacon_base");
-    public static final ITag.INamedTag<Item> BAD_BEACON_PAYMENT = ItemTags.makeWrapperTag("badbeacon:bad_beacon_payment");
+    public static final Tag.Named<Block> BAD_BEACON_BASE = BlockTags.bind("badbeacon:bad_beacon_base");
+    public static final Tag.Named<Item> BAD_BEACON_PAYMENT = ItemTags.bind("badbeacon:bad_beacon_payment");
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
-    public static final DeferredRegister<ContainerType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MODID);
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
 
     public static final RegistryObject<Block> BAD_BEACON = BLOCKS.register("bad_beacon", BadBeaconBlock::new);
-    public static final RegistryObject<Item> BAD_BEACON_ITEM = ITEMS.register("bad_beacon", () -> new BlockItem(BAD_BEACON.get(), new Item.Properties().group(ItemGroup.MISC).rarity(Rarity.RARE)));
-    public static final RegistryObject<TileEntityType<BadBeaconTileEntity>> BAD_BEACON_TILEENTITY = TILE_ENTITIES.register("bad_beacon_tileentity", () -> TileEntityType.Builder.create(BadBeaconTileEntity::new, BadBeaconMod.BAD_BEACON.get()).build(null));
-    public static final RegistryObject<ContainerType<BadBeaconContainer>> BAD_BEACON_CONTAINER = CONTAINERS.register("bad_beacon_container", () -> new ContainerType<>(BadBeaconContainer::new));
+    public static final RegistryObject<Item> BAD_BEACON_ITEM = ITEMS.register("bad_beacon", () -> new BlockItem(BAD_BEACON.get(), new Item.Properties().tab(CreativeModeTab.TAB_MISC).rarity(Rarity.RARE)));
+    public static final RegistryObject<BlockEntityType<BadBeaconBlockEntity>> BAD_BEACON_TILEENTITY = BLOCK_ENTITIES.register("bad_beacon_tileentity", () -> BlockEntityType.Builder.of(BadBeaconBlockEntity::new, BadBeaconMod.BAD_BEACON.get()).build(null));
+    public static final RegistryObject<MenuType<BadBeaconMenu>> BAD_BEACON_CONTAINER = CONTAINERS.register("bad_beacon_container", () -> new MenuType<>(BadBeaconMenu::new));
 
     public BadBeaconMod() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modBus.addListener(this::setup);
+        modBus.addListener(this::dispatch);
         modBus.addListener(this::clientSetup);
 
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
-        TILE_ENTITIES.register(modBus);
+        BLOCK_ENTITIES.register(modBus);
         CONTAINERS.register(modBus);
 
         final Pair<BadBeaconConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(BadBeaconConfig::new);
@@ -66,9 +65,9 @@ public class BadBeaconMod {
         config = specPair.getLeft();
     }
 
-    public void setup(FMLCommonSetupEvent e) {
-        DeferredWorkQueue.runLater(PacketHandler::register);
-    }
+    public void dispatch(ParallelDispatchEvent e) {
+    	e.enqueueWork(PacketHandler::register);
+	}
 
     public void clientSetup(final FMLClientSetupEvent e) {
         BadBeaconMod.registerScreen();
@@ -77,13 +76,13 @@ public class BadBeaconMod {
 
     @OnlyIn(Dist.CLIENT)
     public static void registerScreen() {
-        ScreenManager.registerFactory(BAD_BEACON_CONTAINER.get(), BadBeaconScreen::new);
+        MenuScreens.register(BAD_BEACON_CONTAINER.get(), BadBeaconScreen::new);
     }
 
     @OnlyIn(Dist.CLIENT)
     public static void registerBinds() {
-        RenderTypeLookup.setRenderLayer(BAD_BEACON.get(), RenderType.getCutout());
-        ClientRegistry.bindTileEntityRenderer(BAD_BEACON_TILEENTITY.get(), BadBeaconTileEntityRenderer::new);
+        ItemBlockRenderTypes.setRenderLayer(BAD_BEACON.get(), RenderType.cutout());
+        BlockEntityRenderers.register(BAD_BEACON_TILEENTITY.get(), BadBeaconRenderer::new);
     }
 
     public static class BadBeaconConfig {

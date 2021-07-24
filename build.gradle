@@ -1,11 +1,10 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
+        maven { url = 'https://maven.minecraftforge.net' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -17,7 +16,7 @@ version = project.mc_version + "-" + project.mod_version
 group = project.mod_group
 archivesBaseName = project.archives_base_name
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 minecraft {
     mappings channel: project.forge_channel, version: project.forge_mappings
@@ -38,7 +37,7 @@ minecraft {
             //property 'forge.logging.console.level', 'debug'
 
             mods {
-                nifty {
+                badbeacon {
                     source sourceSets.main
                 }
             }
@@ -54,7 +53,7 @@ minecraft {
             //property 'forge.logging.console.level', 'debug'
 
             mods {
-                nifty {
+                badbeacon {
                     source sourceSets.main
                 }
             }
@@ -62,26 +61,27 @@ minecraft {
     }
 }
 
-repositories {
-    maven {
-        // Temporary mappings
-        url 'https://www.dogforce-games.com/maven/'
-    }
-}
-
 dependencies {
     minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"
+
+    implementation('cpw.mods:securejarhandler') {
+        version {
+            strictly('0.9.45')
+        }
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
-        attributes(["Specification-Title": "badbeacon",
-                    "Specification-Vendor": "Androsa",
-                    "Specification-Version": "1", // We are version 1 of the modlauncher specification
-                    "Implementation-Title": project.name,
-                    "Implementation-Version": "${version}",
-                    "Implementation-Vendor" :"Androsa",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+        attributes([
+                "Specification-Title": "badbeacon",
+                "Specification-Vendor": "Androsa",
+                "Specification-Version": "1", // We are version 1 of the modlauncher specification
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.jar.archiveVersion,
+                "Implementation-Vendor" :"Androsa",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }

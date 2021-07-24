@@ -1,27 +1,31 @@
 package com.androsa.badbeacon;
 
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BeaconBeamBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
 
-public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
+public class BadBeaconBlock extends Block implements EntityBlock, BeaconBeamBlock {
 
     public BadBeaconBlock() {
-        super(Properties.create(Material.GLASS, MaterialColor.BLUE).hardnessAndResistance(0.3F).setLightLevel((val) -> 15).notSolid());
+        super(Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE).strength(0.3F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
     }
 
     @Override
@@ -31,50 +35,55 @@ public class BadBeaconBlock extends Block implements IBeaconBeamColorProvider {
 
     @Override
     @Deprecated
-    public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-        super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity != null && tileentity.receiveClientEvent(id, param);
+    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+        super.triggerEvent(state, worldIn, pos, id, param);
+        BlockEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity != null && tileentity.triggerEvent(id, param);
     }
 
     @Override
     @Nullable
     @Deprecated
-    public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof INamedContainerProvider ? (INamedContainerProvider)tileentity : null;
+    public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
+        BlockEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity instanceof MenuProvider ? (MenuProvider)tileentity : null;
     }
 
     @Override
     @Deprecated
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (!worldIn.isRemote) {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
-            if (tileentity instanceof BadBeaconTileEntity) {
-                player.openContainer((BadBeaconTileEntity) tileentity);
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        if (!worldIn.isClientSide) {
+            BlockEntity tileentity = worldIn.getBlockEntity(pos);
+            if (tileentity instanceof BadBeaconBlockEntity) {
+                player.openMenu((BadBeaconBlockEntity) tileentity);
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if (stack.hasDisplayName()) {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
-            if (tileentity instanceof BadBeaconTileEntity) {
-                ((BadBeaconTileEntity)tileentity).setCustomName(stack.getDisplayName());
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if (stack.hasCustomHoverName()) {
+            BlockEntity tileentity = worldIn.getBlockEntity(pos);
+            if (tileentity instanceof BadBeaconBlockEntity) {
+                ((BadBeaconBlockEntity)tileentity).setCustomName(stack.getDisplayName());
             }
         }
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new BadBeaconTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new BadBeaconBlockEntity(pos, state);
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
+	@Nullable
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+		return BadBeaconMod.BAD_BEACON_TILEENTITY.get() == type ? getBlockTicker(BadBeaconBlockEntity::tick) : null;
+	}
+
+	private static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> getBlockTicker(BlockEntityTicker<? super E> ticker) {
+		return (BlockEntityTicker<A>)ticker;
+	}
 }
