@@ -122,7 +122,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         int y = (this.height - this.imageHeight) / 2;
         this.blit(stack, x, y, 0, 0, this.imageWidth, this.imageHeight);
         this.itemRenderer.blitOffset = 100.0F;
-        this.itemRenderer.renderAndDecorateItem(new ItemStack(Items.BONE), x + 20, y + 109);
+        this.itemRenderer.renderAndDecorateItem(new ItemStack(Items.COPPER_INGOT), x + 20, y + 109);
         this.itemRenderer.renderAndDecorateItem(new ItemStack(Items.COAL), x + 41, y + 109);
         this.itemRenderer.renderAndDecorateItem(new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
         this.itemRenderer.renderAndDecorateItem(new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
@@ -168,7 +168,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
                 j += this.width * 2;
             } else if (this.selected) {
                 j += this.width * 1;
-            } else if (this.isHovered()) {
+            } else if (this.isHoveredOrFocused()) {
                 j += this.width * 3;
             }
 

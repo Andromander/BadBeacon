@@ -5,6 +5,7 @@
     "minecraft:coal_block",
     "minecraft:lapis_block",
     "minecraft:quartz_block",
-    "minecraft:bone_block"
+    "minecraft:copper_block",
+    "minecraft:waxed_copper_block"
   ]
 }
