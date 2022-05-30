@@ -4,9 +4,11 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -37,8 +39,8 @@ public class BadBeaconMod {
     private static final Logger LOGGER = LogManager.getLogger();
     public static BadBeaconConfig config;
 
-    public static final Tag.Named<Block> BAD_BEACON_BASE = BlockTags.bind("badbeacon:bad_beacon_base");
-    public static final Tag.Named<Item> BAD_BEACON_PAYMENT = ItemTags.bind("badbeacon:bad_beacon_payment");
+    public static final TagKey<Block> BAD_BEACON_BASE = BlockTags.create(new ResourceLocation(MODID, "bad_beacon_base"));
+    public static final TagKey<Item> BAD_BEACON_PAYMENT = ItemTags.create(new ResourceLocation(MODID, "bad_beacon_payment"));
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);

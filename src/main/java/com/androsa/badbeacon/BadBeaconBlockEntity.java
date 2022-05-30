@@ -272,8 +272,8 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
-        super.save(compound);
+    public void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
         compound.putInt("Primary", MobEffect.getId(this.primaryEffect));
         compound.putInt("Secondary", MobEffect.getId(this.secondaryEffect));
         compound.putInt("Levels", this.levels);
@@ -282,7 +282,6 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
         }
 
         this.lock.addToTag(compound);
-        return compound;
     }
 
     public void setCustomName(@Nullable Component aname) {
