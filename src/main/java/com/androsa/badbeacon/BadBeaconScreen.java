@@ -27,8 +27,8 @@ import java.util.List;
 @OnlyIn(Dist.CLIENT)
 public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     private static final ResourceLocation BEACON_GUI_TEXTURES = new ResourceLocation(BadBeaconMod.MODID, "textures/gui/container/beacon.png");
-    private static final Component PRIMARY_EFFECT_NAME = new TranslatableComponent("block.minecraft.beacon.primary");
-    private static final Component SECONDARY_EFFECT_NAME = new TranslatableComponent("block.minecraft.beacon.secondary");
+    private static final Component PRIMARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.primary");
+    private static final Component SECONDARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.secondary");
     private final List<BadBeaconButton> buttons = Lists.newArrayList();
     private MobEffect primaryEffect;
     private MobEffect secondaryEffect;
@@ -151,7 +151,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         private boolean selected;
 
         protected Button(int x, int y) {
-            super(x, y, 22, 22, TextComponent.EMPTY);
+            super(x, y, 22, 22, CommonComponents.EMPTY);
         }
 
         protected Button(int x, int y, Component component) {
@@ -219,7 +219,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
 		protected MutableComponent createDescription(MobEffect effect) {
-        	return new TranslatableComponent(effect.getDescriptionId());
+        	return Component.translatable(effect.getDescriptionId());
 		}
 
         @Override
@@ -320,7 +320,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
 		protected MutableComponent createDescription(MobEffect effect) {
-			return (new TranslatableComponent(effect.getDescriptionId())).append(" II");
+			return (Component.translatable(effect.getDescriptionId())).append(" II");
 		}
 
 		public void updateStatus(int id) {

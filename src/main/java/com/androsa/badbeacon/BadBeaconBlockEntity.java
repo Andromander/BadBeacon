@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -296,7 +295,7 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return this.customName != null ? this.customName : new TranslatableComponent("badbeacon.container.bad_beacon");
+        return this.customName != null ? this.customName : Component.translatable("badbeacon.container.bad_beacon");
     }
 
 	public static class BeamSegment {

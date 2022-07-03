@@ -1,5 +1,5 @@
 modLoader="javafml" #mandatory
-loaderVersion="[40,)" #mandatory
+loaderVersion="[41,)" #mandatory
 
 issueTrackerURL="https://github.com/Andromander/BadBeacon/issues" #optional
 displayURL="https://www.curseforge.com/minecraft/mc-mods/bad-beacon" #optional
@@ -21,13 +21,13 @@ Affect everyone or just the players. Add some blocks and payment methods with a 
 [[dependencies.badbeacon]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
-    versionRange="[40,)" #mandatory
+    versionRange="[41,)" #mandatory
     ordering="NONE"
     side="BOTH"
 # Here's another dependency
 [[dependencies.badbeacon]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2,]"
+    versionRange="[1.19,]"
     ordering="NONE"
     side="BOTH"
