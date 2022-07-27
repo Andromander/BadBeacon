@@ -43,8 +43,8 @@ public class BadBeaconMod {
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MODID);
-    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MODID);
 
     public static final RegistryObject<Block> BAD_BEACON = BLOCKS.register("bad_beacon", BadBeaconBlock::new);
     public static final RegistryObject<Item> BAD_BEACON_ITEM = ITEMS.register("bad_beacon", () -> new BlockItem(BAD_BEACON.get(), new Item.Properties().tab(CreativeModeTab.TAB_MISC).rarity(Rarity.RARE)));
@@ -82,7 +82,6 @@ public class BadBeaconMod {
 
     @OnlyIn(Dist.CLIENT)
     public static void registerBinds() {
-        ItemBlockRenderTypes.setRenderLayer(BAD_BEACON.get(), RenderType.cutout());
         BlockEntityRenderers.register(BAD_BEACON_TILEENTITY.get(), BadBeaconRenderer::new);
     }
 
