@@ -107,7 +107,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         for(BadBeaconButton button : this.buttons) {
             if (button.isShowingTooltip()) {
-                button.renderToolTip(stack, mouseX - this.leftPos, mouseY - this.topPos);
+                button.renderToolTipFuck(stack, mouseX - this.leftPos, mouseY - this.topPos);
                 break;
             }
         }
@@ -134,7 +134,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     public void render(PoseStack stack, int mouseX, int mouseZ, float ticks) {
         this.renderBackground(stack);
         super.render(stack, mouseX, mouseZ, ticks);
-        this.renderTooltip(stack, mouseX, mouseZ); //renderHoveredToolTip
+        this.renderTooltip(stack, mouseX, mouseZ);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -143,7 +143,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
     	void updateStatus(int id);
 
-    	void renderToolTip(PoseStack stack, int x, int z);
+    	void renderToolTipFuck(PoseStack stack, int x, int z);
 	}
 
     @OnlyIn(Dist.CLIENT)
@@ -236,7 +236,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         }
 
         @Override
-        public void renderToolTip(PoseStack stack, int x, int y) {
+        public void renderToolTipFuck(PoseStack stack, int x, int y) {
             BadBeaconScreen.this.renderTooltip(stack, this.tooltip, x, y);
         }
 
@@ -275,7 +275,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         }
 
 		@Override
-		public void renderToolTip(PoseStack stack, int x, int y) {
+		public void renderToolTipFuck(PoseStack stack, int x, int y) {
 			BadBeaconScreen.this.renderTooltip(stack, BadBeaconScreen.this.title, x, y);
 		}
 	}
