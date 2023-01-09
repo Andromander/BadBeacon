@@ -172,7 +172,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
                 j += this.width * 3;
             }
 
-            this.blit(stack, this.x, this.y, j, 219, this.width, this.height);
+            this.blit(stack, this.getX(), this.getY(), j, 219, this.width, this.height);
             this.blitButton(stack);
         }
 
@@ -192,7 +192,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
 		@Override
-		public void updateNarration(NarrationElementOutput output) {
+		protected void updateWidgetNarration(NarrationElementOutput output) {
 			this.defaultButtonNarrationText(output);
 		}
 	}
@@ -242,8 +242,8 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         @Override
         protected void blitButton(PoseStack stack) {
-            RenderSystem.setShaderTexture(0, textureSprite.atlas().location());
-            blit(stack, this.x + 2, this.y + 2, this.getBlitOffset(), 18, 18, this.textureSprite);
+            RenderSystem.setShaderTexture(0, textureSprite.atlasLocation());
+            blit(stack, this.getX() + 2, this.getY() + 2, this.getBlitOffset(), 18, 18, this.textureSprite);
         }
 
 		@Override
@@ -271,7 +271,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         @Override
         protected void blitButton(PoseStack stack) {
-            this.blit(stack, this.x + 2, this.y + 2, this.iconX, this.iconY, 18, 18);
+            this.blit(stack, this.getX() + 2, this.getY() + 2, this.iconX, this.iconY, 18, 18);
         }
 
 		@Override
