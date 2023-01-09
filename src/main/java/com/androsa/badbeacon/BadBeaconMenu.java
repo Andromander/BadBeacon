@@ -135,7 +135,6 @@ public class BadBeaconMenu extends AbstractContainerMenu {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public boolean isActive() {
         return !this.tileBeacon.getItem(0).isEmpty();
     }

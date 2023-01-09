@@ -294,7 +294,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
 		@Override
 		public void updateStatus(int id) {
-			this.active = BadBeaconScreen.this.menu.isActive();
+			this.active = BadBeaconScreen.this.menu.isActive() && BadBeaconScreen.this.primaryEffect != null;
 		}
 	}
 
