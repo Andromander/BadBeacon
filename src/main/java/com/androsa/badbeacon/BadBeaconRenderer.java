@@ -7,12 +7,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
 public class BadBeaconRenderer implements BlockEntityRenderer<BadBeaconBlockEntity> {
     private static final ResourceLocation TEXTURE_BEACON_BEAM = new ResourceLocation("textures/entity/beacon_beam.png");
 
@@ -46,7 +43,7 @@ public class BadBeaconRenderer implements BlockEntityRenderer<BadBeaconBlockEnti
 	}
 
 	@Override
-	public boolean shouldRender(BadBeaconBlockEntity p_173531_, Vec3 p_173532_) {
-		return Vec3.atCenterOf(p_173531_.getBlockPos()).multiply(1.0D, 0.0D, 1.0D).closerThan(p_173532_.multiply(1.0D, 0.0D, 1.0D), this.getViewDistance());
+	public boolean shouldRender(BadBeaconBlockEntity entity, Vec3 viewpos) {
+        return Vec3.atCenterOf(entity.getBlockPos()).multiply(1.0D, 0.0D, 1.0D).closerThan(viewpos.multiply(1.0D, 0.0D, 1.0D), this.getViewDistance());
 	}
 }

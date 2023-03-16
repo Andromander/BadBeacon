@@ -29,6 +29,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -298,7 +299,12 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
         return this.customName != null ? this.customName : Component.translatable("badbeacon.container.bad_beacon");
     }
 
-	public static class BeamSegment {
+    @Override
+    public AABB getRenderBoundingBox() {
+        return IForgeBlockEntity.INFINITE_EXTENT_AABB;
+    }
+
+    public static class BeamSegment {
         private final float[] colors;
         private int height;
 
