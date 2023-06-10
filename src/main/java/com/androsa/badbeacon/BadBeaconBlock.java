@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 public class BadBeaconBlock extends Block implements EntityBlock, BeaconBeamBlock {
 
     public BadBeaconBlock() {
-        super(Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE).strength(0.3F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
+        super(Properties.of().mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.SNARE).strength(0.3F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
     }
 
     @Override

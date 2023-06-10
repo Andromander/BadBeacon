@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -76,8 +76,8 @@ public class BadBeaconMod {
         BadBeaconMod.registerBinds();
     }
 
-    public void buildContents(final CreativeModeTabEvent.BuildContents e) {
-        if (e.getTab() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+    public void buildContents(final BuildCreativeModeTabContentsEvent e) {
+        if (e.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             e.accept(BAD_BEACON_ITEM);
         }
     }

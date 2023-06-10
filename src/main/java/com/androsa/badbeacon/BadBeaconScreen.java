@@ -1,15 +1,13 @@
 package com.androsa.badbeacon;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
@@ -99,29 +97,28 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 	}
 
 	@Override
-    protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
-        drawCenteredString(stack, this.font, PRIMARY_EFFECT_NAME, 62, 10, 14737632);
-        drawCenteredString(stack, this.font, SECONDARY_EFFECT_NAME, 169, 10, 14737632);
+    protected void renderLabels(GuiGraphics stack, int mouseX, int mouseY) {
+        stack.drawCenteredString(this.font, PRIMARY_EFFECT_NAME, 62, 10, 14737632);
+        stack.drawCenteredString(this.font, SECONDARY_EFFECT_NAME, 169, 10, 14737632);
     }
 
     @Override
-    protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.setShaderTexture(0, BEACON_GUI_TEXTURES);
+    protected void renderBg(GuiGraphics stack, float partialTicks, int mouseX, int mouseY) {
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
-        blit(stack, x, y, 0, 0, this.imageWidth, this.imageHeight);
-        stack.pushPose();
-        stack.translate(0.0F, 0.0F, 100.0F);
-        this.itemRenderer.renderAndDecorateItem(stack, new ItemStack(Items.COPPER_INGOT), x + 20, y + 109);
-        this.itemRenderer.renderAndDecorateItem(stack, new ItemStack(Items.COAL), x + 41, y + 109);
-        this.itemRenderer.renderAndDecorateItem(stack, new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
-        this.itemRenderer.renderAndDecorateItem(stack, new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
-        this.itemRenderer.renderAndDecorateItem(stack, new ItemStack(Items.QUARTZ), x + 42 + 66, y + 109);
-        stack.popPose();
+        stack.blit(BEACON_GUI_TEXTURES, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        stack.pose().pushPose();
+        stack.pose().translate(0.0F, 0.0F, 100.0F);
+        stack.renderItem(new ItemStack(Items.COPPER_INGOT), x + 20, y + 109);
+        stack.renderItem(new ItemStack(Items.COAL), x + 41, y + 109);
+        stack.renderItem(new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
+        stack.renderItem(new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
+        stack.renderItem(new ItemStack(Items.QUARTZ), x + 42 + 66, y + 109);
+        stack.pose().popPose();
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseZ, float ticks) {
+    public void render(GuiGraphics stack, int mouseX, int mouseZ, float ticks) {
         this.renderBackground(stack);
         super.render(stack, mouseX, mouseZ, ticks);
         this.renderTooltip(stack, mouseX, mouseZ);
@@ -143,10 +140,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
         @Override
-        public void renderWidget(PoseStack stack, int backX, int backY, float partial) {
-        	RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, BadBeaconScreen.BEACON_GUI_TEXTURES);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        public void renderWidget(GuiGraphics stack, int backX, int backY, float partial) {
             int j = 0;
             if (!this.active) {
                 j += this.width * 2;
@@ -156,11 +150,11 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
                 j += this.width * 3;
             }
 
-            blit(stack, this.getX(), this.getY(), j, 219, this.width, this.height);
+            stack.blit(BadBeaconScreen.BEACON_GUI_TEXTURES, this.getX(), this.getY(), j, 219, this.width, this.height);
             this.blitButton(stack);
         }
 
-        protected abstract void blitButton(PoseStack stack);
+        protected abstract void blitButton(GuiGraphics stack);
 
         public boolean isSelected() {
             return this.selected;
@@ -213,9 +207,8 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         }
 
         @Override
-        protected void blitButton(PoseStack stack) {
-            RenderSystem.setShaderTexture(0, textureSprite.atlasLocation());
-            blit(stack, this.getX() + 2, this.getY() + 2, 0, 18, 18, this.textureSprite);
+        protected void blitButton(GuiGraphics stack) {
+            stack.blit(this.getX() + 2, this.getY() + 2, 0, 18, 18, this.textureSprite);
         }
 
 		@Override
@@ -241,8 +234,8 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         }
 
         @Override
-        protected void blitButton(PoseStack stack) {
-            blit(stack, this.getX() + 2, this.getY() + 2, this.iconX, this.iconY, 18, 18);
+        protected void blitButton(GuiGraphics stack) {
+            stack.blit(BadBeaconScreen.BEACON_GUI_TEXTURES, this.getX() + 2, this.getY() + 2, this.iconX, this.iconY, 18, 18);
         }
 	}
 

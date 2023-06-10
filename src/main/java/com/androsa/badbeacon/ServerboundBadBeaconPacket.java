@@ -36,16 +36,12 @@ public class ServerboundBadBeaconPacket {
     public static class Handler {
 
         public static void handle(final ServerboundBadBeaconPacket packet, final Supplier<NetworkEvent.Context> context) {
-            context.get().enqueueWork(() -> {
-                Player player = context.get().getSender();
-                if (player != null) {
-                    if (player.containerMenu instanceof BadBeaconMenu) {
-                        ((BadBeaconMenu)player.containerMenu).handleSlots(packet.getPrimaryEffect(), packet.getSecondaryEffect());
-                    }
+            Player player = context.get().getSender();
+            if (player != null) {
+                if (player.containerMenu instanceof BadBeaconMenu) {
+                    ((BadBeaconMenu)player.containerMenu).handleSlots(packet.getPrimaryEffect(), packet.getSecondaryEffect());
                 }
-
-            });
-            context.get().setPacketHandled(true);
+            }
         }
     }
 }

@@ -14,6 +14,6 @@ public class PacketHandler {
     );
 
     public static void register() {
-        HANDLER.messageBuilder(ServerboundBadBeaconPacket.class, 0).encoder(ServerboundBadBeaconPacket::write).decoder(ServerboundBadBeaconPacket::new).consumer(ServerboundBadBeaconPacket.Handler::handle).add();
+        HANDLER.messageBuilder(ServerboundBadBeaconPacket.class, 0).encoder(ServerboundBadBeaconPacket::write).decoder(ServerboundBadBeaconPacket::new).consumerMainThread(ServerboundBadBeaconPacket.Handler::handle).add();
     }
 }
