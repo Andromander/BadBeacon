@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.extensions.IBlockEntityRendererExtension;
 
 import java.util.List;
 
@@ -46,4 +48,9 @@ public class BadBeaconRenderer implements BlockEntityRenderer<BadBeaconBlockEnti
 	public boolean shouldRender(BadBeaconBlockEntity entity, Vec3 viewpos) {
         return Vec3.atCenterOf(entity.getBlockPos()).multiply(1.0D, 0.0D, 1.0D).closerThan(viewpos.multiply(1.0D, 0.0D, 1.0D), this.getViewDistance());
 	}
+
+    @Override
+    public AABB getRenderBoundingBox(BadBeaconBlockEntity blockEntity) {
+        return IBlockEntityRendererExtension.INFINITE_EXTENT_AABB;
+    }
 }

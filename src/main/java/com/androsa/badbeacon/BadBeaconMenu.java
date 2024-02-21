@@ -1,5 +1,6 @@
 package com.androsa.badbeacon;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffect;
@@ -8,6 +9,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class BadBeaconMenu extends AbstractContainerMenu {
     private final Container tileBeacon = new SimpleContainer(1) {
@@ -115,20 +117,28 @@ public class BadBeaconMenu extends AbstractContainerMenu {
         return this.data.get(0);
     }
 
+    public static int encodeEffect(MobEffect effect) {
+        return effect == null ? 0 : BuiltInRegistries.MOB_EFFECT.getId(effect) + 1;
+    }
+
+    public static MobEffect decodeEffect(int id) {
+        return id == 0 ? null : BuiltInRegistries.MOB_EFFECT.byId(id - 1);
+    }
+
     @Nullable
     public MobEffect getPrimaryEffect() {
-        return MobEffect.byId(this.data.get(1));
+        return decodeEffect(this.data.get(1));
     }
 
     @Nullable
     public MobEffect getSecondaryEffect() {
-        return MobEffect.byId(this.data.get(2));
+        return decodeEffect(this.data.get(2));
     }
 
-    public void handleSlots(int primary, int secondary) {
+    public void handleSlots(Optional<MobEffect> primary, Optional<MobEffect> secondary) {
         if (this.beaconSlot.hasItem()) {
-            this.data.set(1, primary);
-            this.data.set(2, secondary);
+            this.data.set(1, encodeEffect(primary.orElse(null)));
+            this.data.set(2, encodeEffect(secondary.orElse(null)));
             this.beaconSlot.remove(1);
         }
     }

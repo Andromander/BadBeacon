@@ -18,8 +18,10 @@ import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     private static final ResourceLocation BEACON_GUI_TEXTURES = new ResourceLocation(BadBeaconMod.MODID, "textures/gui/container/beacon.png");
@@ -119,7 +121,6 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
     @Override
     public void render(GuiGraphics stack, int mouseX, int mouseZ, float ticks) {
-        this.renderBackground(stack);
         super.render(stack, mouseX, mouseZ, ticks);
         this.renderTooltip(stack, mouseX, mouseZ);
     }
@@ -246,7 +247,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         @Override
         public void onPress() {
-            PacketHandler.HANDLER.sendToServer(new ServerboundBadBeaconPacket(MobEffect.getId(BadBeaconScreen.this.primaryEffect), MobEffect.getId(BadBeaconScreen.this.secondaryEffect)));
+            PacketDistributor.SERVER.noArg().send(new ServerboundBadBeaconPacket(Optional.ofNullable(BadBeaconScreen.this.primaryEffect), Optional.ofNullable(BadBeaconScreen.this.secondaryEffect)));
             BadBeaconScreen.this.minecraft.player.closeContainer();
         }
 

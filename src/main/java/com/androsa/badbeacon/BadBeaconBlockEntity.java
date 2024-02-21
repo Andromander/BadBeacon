@@ -27,9 +27,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -58,8 +57,8 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
         public int get(int index) {
 			return switch (index) {
 				case 0 -> BadBeaconBlockEntity.this.levels;
-				case 1 -> MobEffect.getId(BadBeaconBlockEntity.this.primaryEffect);
-				case 2 -> MobEffect.getId(BadBeaconBlockEntity.this.secondaryEffect);
+				case 1 -> BadBeaconMenu.encodeEffect(BadBeaconBlockEntity.this.primaryEffect);
+				case 2 -> BadBeaconMenu.encodeEffect(BadBeaconBlockEntity.this.secondaryEffect);
 				default -> 0;
 			};
         }
@@ -255,7 +254,7 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
 
     @Nullable
     private static MobEffect isBeaconEffect(int value) {
-        MobEffect effect = MobEffect.byId(value);
+        MobEffect effect = BadBeaconMenu.decodeEffect(value);
         return VALID_EFFECTS.contains(effect) ? effect : null;
     }
 
@@ -274,8 +273,8 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public void saveAdditional(CompoundTag compound) {
         super.saveAdditional(compound);
-        compound.putInt("Primary", MobEffect.getId(this.primaryEffect));
-        compound.putInt("Secondary", MobEffect.getId(this.secondaryEffect));
+        compound.putInt("Primary", BadBeaconMenu.encodeEffect(this.primaryEffect));
+        compound.putInt("Secondary", BadBeaconMenu.encodeEffect(this.secondaryEffect));
         compound.putInt("Levels", this.levels);
         if (this.customName != null) {
             compound.putString("CustomName", Component.Serializer.toJson(this.customName));
@@ -297,11 +296,6 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public Component getDisplayName() {
         return this.customName != null ? this.customName : Component.translatable("badbeacon.container.bad_beacon");
-    }
-
-    @Override
-    public AABB getRenderBoundingBox() {
-        return IForgeBlockEntity.INFINITE_EXTENT_AABB;
     }
 
     public static class BeamSegment {

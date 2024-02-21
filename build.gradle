@@ -1,73 +1,67 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
+plugins {
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.83'
 }
-apply plugin: 'net.minecraftforge.gradle'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
 version = project.mc_version + "-" + project.mod_version
 group = project.mod_group
-archivesBaseName = project.archives_base_name
+
+repositories {
+    mavenLocal()
+}
+
+base {
+    archivesName = project.archives_base_name
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-minecraft {
-    mappings channel: project.forge_channel, version: project.forge_mappings
+runs {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     //accessTransformer = file('my_at.cfg')
 
     // default run configurations.
     // these can be tweaked, removed, or duplicated as needed.
-    runs {
-        client {
-            workingDirectory project.file('run')
+    configureEach {
+        // Recommended logging data for a userdev environment
+        //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            // Recommended logging data for a userdev environment
-            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+        // Recommended logging level for the console
+        //property 'forge.logging.console.level', 'debug'
 
-            // Recommended logging level for the console
-            //property 'forge.logging.console.level', 'debug'
+        modSource project.sourceSets.main
+    }
 
-            mods {
-                badbeacon {
-                    source sourceSets.main
-                }
-            }
-        }
+    client {
+        systemProperty 'forge.enabledGameTesetNamespaces', project.mod_id
+    }
 
-        server {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            //property 'forge.logging.console.level', 'debug'
-
-            mods {
-                badbeacon {
-                    source sourceSets.main
-                }
-            }
-        }
+    server {
+        systemProperty 'forge.enabledGameTesetNamespaces', project.mod_id
+        programArgument '--nogui'
     }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"
+    implementation "net.neoforged:neoforge:${project.neo_version}"
+}
 
-    implementation('cpw.mods:securejarhandler') {
-        version {
-            strictly('0.9.45')
-        }
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            mc_version          : mc_version, mc_version_range: mc_version_range,
+            neo_version         : neo_version, neo_version_range: neo_version_range,
+            loader_version_range: loader_version_range,
+            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            pack_format_number  : pack_format_number,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
     }
 }
 

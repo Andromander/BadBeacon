@@ -1,47 +1,46 @@
 package com.androsa.badbeacon;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
-import java.util.function.Supplier;
+import java.util.Optional;
 
-public class ServerboundBadBeaconPacket {
-    private final int primaryEffect;
-    private final int secondaryEffect;
+public record ServerboundBadBeaconPacket(Optional<MobEffect> primaryEffect, Optional<MobEffect> secondaryEffect) implements CustomPacketPayload {
 
-    public ServerboundBadBeaconPacket(int primaryEffectIn, int secondaryEffectIn) {
-        this.primaryEffect = primaryEffectIn;
-        this.secondaryEffect = secondaryEffectIn;
-    }
+    public static final ResourceLocation ID = new ResourceLocation(BadBeaconMod.MODID, "update_bad_beacon");
 
     public ServerboundBadBeaconPacket(FriendlyByteBuf buf) {
-        this.primaryEffect = buf.readVarInt();
-        this.secondaryEffect = buf.readVarInt();
+        this(buf.readOptional(reader -> reader.readById(BuiltInRegistries.MOB_EFFECT)), buf.readOptional(reader -> reader.readById(BuiltInRegistries.MOB_EFFECT)));
     }
 
+    @Override
     public void write(FriendlyByteBuf buf) {
-        buf.writeVarInt(this.primaryEffect);
-        buf.writeVarInt(this.secondaryEffect);
+        buf.writeOptional(this.primaryEffect, (bb, effect) -> bb.writeId(BuiltInRegistries.MOB_EFFECT, effect));
+        buf.writeOptional(this.secondaryEffect, (bb, effect) -> bb.writeId(BuiltInRegistries.MOB_EFFECT, effect));
     }
 
-	public int getPrimaryEffect() {
-        return this.primaryEffect;
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public int getSecondaryEffect() {
-        return this.secondaryEffect;
-    }
-
-    public static class Handler {
-
-        public static void handle(final ServerboundBadBeaconPacket packet, final Supplier<NetworkEvent.Context> context) {
-            Player player = context.get().getSender();
-            if (player != null) {
+    public static void handle(final ServerboundBadBeaconPacket packet, PlayPayloadContext context) {
+        context.workHandler().execute(() -> {
+            Optional<Player> optional = context.player();
+            if (optional.isPresent()) {
+                Player player = optional.get();
                 if (player.containerMenu instanceof BadBeaconMenu) {
-                    ((BadBeaconMenu)player.containerMenu).handleSlots(packet.getPrimaryEffect(), packet.getSecondaryEffect());
+                    if (!player.containerMenu.stillValid(player)) {
+                        return;
+                    }
+                    ((BadBeaconMenu)player.containerMenu).handleSlots(packet.primaryEffect(), packet.secondaryEffect());
                 }
             }
-        }
+        });
     }
 }

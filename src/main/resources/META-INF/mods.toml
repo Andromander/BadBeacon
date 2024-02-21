@@ -1,16 +1,16 @@
 modLoader="javafml" #mandatory
-loaderVersion="[46,)" #mandatory
+loaderVersion="${loader_version_range}" #mandatory
 
 issueTrackerURL="https://github.com/Andromander/BadBeacon/issues" #optional
 displayURL="https://www.curseforge.com/minecraft/mc-mods/bad-beacon" #optional
 credits="Credit to the culmination of tiny ideas" #optional
 authors="Androsa" #optional
-license="MIT License"
+license="${mod_license}"
 
 [[mods]] #mandatory
 modId="badbeacon" #mandatory
-version="${file.jarVersion}" #mandatory
-displayName="Bad Beacon" #mandatory
+version="${mod_version}" #mandatory
+displayName="${mod_name}" #mandatory
 description='''
 Imagine making a Beacon one day, but instead of a Nether Star and some Obsidian, you substitute it for a Heart of the Sea and some Nether Wart Blocks.
 
@@ -19,15 +19,15 @@ Affect everyone or just the players. Add some blocks and payment methods with a 
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.badbeacon]] #optional
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="[46,)" #mandatory
+    modId="neoforge" #mandatory
+    type="required" #mandatory
+    versionRange="${neo_version_range}" #mandatory
     ordering="NONE"
     side="BOTH"
 # Here's another dependency
 [[dependencies.badbeacon]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.20,]"
+    type="required"
+    versionRange="${mc_version_range}"
     ordering="NONE"
     side="BOTH"
