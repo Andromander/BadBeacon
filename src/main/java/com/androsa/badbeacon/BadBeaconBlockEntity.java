@@ -3,6 +3,8 @@ package com.androsa.badbeacon;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -32,24 +34,25 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
 
-    public static final MobEffect[][] EFFECTS_LIST = new MobEffect[][]{
-            {MobEffects.MOVEMENT_SLOWDOWN, MobEffects.DIG_SLOWDOWN},
-            {MobEffects.UNLUCK, MobEffects.BLINDNESS},
-            {MobEffects.WEAKNESS},
-            {MobEffects.POISON}};
-    private static final Set<MobEffect> VALID_EFFECTS = Arrays.stream(EFFECTS_LIST).flatMap(Arrays::stream).collect(Collectors.toSet());
+    public static final List<List<Holder<MobEffect>>> EFFECTS_LIST = List.of(
+            List.of(MobEffects.MOVEMENT_SLOWDOWN, MobEffects.DIG_SLOWDOWN),
+            List.of(MobEffects.UNLUCK, MobEffects.BLINDNESS),
+            List.of(MobEffects.WEAKNESS),
+            List.of(MobEffects.POISON));
+    private static final Set<Holder<MobEffect>> VALID_EFFECTS = EFFECTS_LIST.stream().flatMap(Collection::stream).collect(Collectors.toSet());
     private List<BadBeaconBlockEntity.BeamSegment> beamSegments = Lists.newArrayList();
     private List<BadBeaconBlockEntity.BeamSegment> checkSegments = Lists.newArrayList();
     private int levels;
     private int lastY = -1;
-    private MobEffect primaryEffect;
-    private MobEffect secondaryEffect;
+    private Holder<MobEffect> primaryEffect;
+    private Holder<MobEffect> secondaryEffect;
     private Component customName;
     private LockCode lock = LockCode.NO_LOCK;
     private final ContainerData dataAccess = new ContainerData() {
@@ -191,7 +194,7 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
         super.setRemoved();
     }
 
-    private static void applyEffects(Level level, BlockPos pos, int beaconlevel, MobEffect primary, MobEffect secondary) {
+    private static void applyEffects(Level level, BlockPos pos, int beaconlevel, Holder<MobEffect> primary, Holder<MobEffect> secondary) {
         if (!level.isClientSide && primary != null) {
             double size = beaconlevel * 10 + 10;
             int mul = 0;
@@ -248,41 +251,42 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        return this.saveCustomOnly(provider);
     }
 
     @Nullable
-    private static MobEffect isBeaconEffect(int value) {
-        MobEffect effect = BadBeaconMenu.decodeEffect(value);
+    private static Holder<MobEffect> isBeaconEffect(int value) {
+        Holder<MobEffect> effect = BadBeaconMenu.decodeEffect(value);
         return VALID_EFFECTS.contains(effect) ? effect : null;
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
         this.primaryEffect = isBeaconEffect(compound.getInt("Primary"));
         this.secondaryEffect = isBeaconEffect(compound.getInt("Secondary"));
         if (compound.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(compound.getString("CustomName"));
+            this.customName = parseCustomNameSafe(compound.getString("CustomName"), provider);
         }
 
         this.lock = LockCode.fromTag(compound);
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
         compound.putInt("Primary", BadBeaconMenu.encodeEffect(this.primaryEffect));
         compound.putInt("Secondary", BadBeaconMenu.encodeEffect(this.secondaryEffect));
         compound.putInt("Levels", this.levels);
         if (this.customName != null) {
-            compound.putString("CustomName", Component.Serializer.toJson(this.customName));
+            compound.putString("CustomName", Component.Serializer.toJson(this.customName, provider));
         }
 
         this.lock.addToTag(compound);
     }
 
+    //TODO: This doesn't appear to do anything?
     public void setCustomName(@Nullable Component aname) {
         this.customName = aname;
     }

@@ -17,15 +17,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +52,7 @@ public class BadBeaconMod {
     public static final Supplier<BlockEntityType<BadBeaconBlockEntity>> BAD_BEACON_TILEENTITY = BLOCK_ENTITIES.register("bad_beacon_tileentity", () -> BlockEntityType.Builder.of(BadBeaconBlockEntity::new, BadBeaconMod.BAD_BEACON.get()).build(null));
     public static final Supplier<MenuType<BadBeaconMenu>> BAD_BEACON_CONTAINER = CONTAINERS.register("bad_beacon_container", () -> new MenuType<>(BadBeaconMenu::new, FeatureFlags.VANILLA_SET));
 
-    public BadBeaconMod(IEventBus bus) {
+    public BadBeaconMod(IEventBus bus, ModContainer container) {
         bus.addListener(this::clientSetup);
         bus.addListener(this::registerPayload);
         bus.addListener(this::buildContents);
@@ -64,7 +64,7 @@ public class BadBeaconMod {
         CONTAINERS.register(bus);
 
         final Pair<BadBeaconConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(BadBeaconConfig::new);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, specPair.getRight());
+        container.registerConfig(ModConfig.Type.COMMON, specPair.getRight());
         config = specPair.getLeft();
     }
 
@@ -72,9 +72,9 @@ public class BadBeaconMod {
         BadBeaconMod.registerBinds();
     }
 
-    public void registerPayload(final RegisterPayloadHandlerEvent event) {
-        final IPayloadRegistrar registrar = event.registrar("badbeacon").versioned("1").optional();
-        registrar.play(ServerboundBadBeaconPacket.ID, ServerboundBadBeaconPacket::new, payload -> payload.server(ServerboundBadBeaconPacket::handle));
+    public void registerPayload(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("badbeacon").versioned("1").optional();
+        registrar.playToServer(ServerboundBadBeaconPacket.ID, ServerboundBadBeaconPacket.CODEC, ServerboundBadBeaconPacket::handle);
     }
 
     public void buildContents(final BuildCreativeModeTabContentsEvent e) {

@@ -1,6 +1,6 @@
 {
   "result": {
-    "item": "badbeacon:bad_beacon",
+    "id": "badbeacon:bad_beacon",
     "count": 3
   },
   "type": "minecraft:crafting_shaped",

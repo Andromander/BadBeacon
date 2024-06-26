@@ -5,10 +5,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.extensions.IBlockEntityRendererExtension;
 
 import java.util.List;
 
@@ -51,6 +51,7 @@ public class BadBeaconRenderer implements BlockEntityRenderer<BadBeaconBlockEnti
 
     @Override
     public AABB getRenderBoundingBox(BadBeaconBlockEntity blockEntity) {
-        return IBlockEntityRendererExtension.INFINITE_EXTENT_AABB;
+        BlockPos pos = blockEntity.getBlockPos();
+        return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, BeaconRenderer.MAX_RENDER_Y, pos.getZ() + 1.0);
     }
 }

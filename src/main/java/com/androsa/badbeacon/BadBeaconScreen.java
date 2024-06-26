@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -28,8 +29,8 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     private static final Component PRIMARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.primary");
     private static final Component SECONDARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.secondary");
     private final List<BadBeaconButton> buttons = Lists.newArrayList();
-    private MobEffect primaryEffect;
-    private MobEffect secondaryEffect;
+    private Holder<MobEffect> primaryEffect;
+    private Holder<MobEffect> secondaryEffect;
 
     public BadBeaconScreen(final BadBeaconMenu container, Inventory inventory, Component component) {
         super(container, inventory, component);
@@ -56,28 +57,28 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         this.addButton(new BadBeaconScreen.CancelButton(this.leftPos + 190, this.topPos + 107));
 
 		for(int tier = 0; tier <= 2; ++tier) {
-			int s1 = BadBeaconBlockEntity.EFFECTS_LIST[tier].length;
+			int s1 = BadBeaconBlockEntity.EFFECTS_LIST.get(tier).size();
 			int w1 = s1 * 22 + (s1 - 1) * 2;
 
 			for(int i = 0; i < s1; ++i) {
-				MobEffect primary = BadBeaconBlockEntity.EFFECTS_LIST[tier][i];
+                Holder<MobEffect> primary = BadBeaconBlockEntity.EFFECTS_LIST.get(tier).get(i);
 				BadBeaconScreen.PowerButton powerbutton1 = new BadBeaconScreen.PowerButton(this.leftPos + 76 + i * 24 - w1 / 2, this.topPos + 22 + tier * 25, primary, true, tier);
 				powerbutton1.active = false;
 				this.addButton(powerbutton1);
 			}
 		}
 
-		int t3 = BadBeaconBlockEntity.EFFECTS_LIST[3].length + 1;
+		int t3 = BadBeaconBlockEntity.EFFECTS_LIST.get(3).size() + 1;
 		int w2 = t3 * 22 + (t3 - 1) * 2;
 
 		for(int tier2 = 0; tier2 < t3 - 1; ++tier2) {
-			MobEffect secondary = BadBeaconBlockEntity.EFFECTS_LIST[3][tier2];
+            Holder<MobEffect> secondary = BadBeaconBlockEntity.EFFECTS_LIST.get(3).get(tier2);
 			BadBeaconScreen.PowerButton powerbutton2 = new BadBeaconScreen.PowerButton(this.leftPos + 167 + tier2 * 24 - w2 / 2, this.topPos + 47, secondary, false, 3);
 			powerbutton2.active = false;
 			this.addButton(powerbutton2);
 		}
 
-		BadBeaconScreen.PowerButton upgradebutton = new BadBeaconScreen.UpgradeButton(this.leftPos + 167 + (t3 - 1) * 24 - w2 / 2, this.topPos + 47, BeaconBlockEntity.BEACON_EFFECTS[0][0]);
+		BadBeaconScreen.PowerButton upgradebutton = new BadBeaconScreen.UpgradeButton(this.leftPos + 167 + (t3 - 1) * 24 - w2 / 2, this.topPos + 47, BeaconBlockEntity.BEACON_EFFECTS.getFirst().getFirst());
 		upgradebutton.visible = false;
 		this.addButton(upgradebutton);
     }
@@ -174,24 +175,24 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     class PowerButton extends BadBeaconScreen.Button {
 		private final boolean isPrimary;
 		protected final int tier;
-        private MobEffect effect;
+        private Holder<MobEffect> effect;
         private TextureAtlasSprite textureSprite;
 
-        public PowerButton(int x, int y, MobEffect effectIn, boolean primary, int tier) {
+        public PowerButton(int x, int y, Holder<MobEffect> effectIn, boolean primary, int tier) {
             super(x, y);
             this.isPrimary = primary;
             this.tier = tier;
             this.setEffect(effectIn);
         }
 
-        protected void setEffect(MobEffect effect) {
+        protected void setEffect(Holder<MobEffect> effect) {
         	this.effect = effect;
         	this.textureSprite = Minecraft.getInstance().getMobEffectTextures().get(effect);
         	this.setTooltip(Tooltip.create(this.createDescription(effect), null));
 		}
 
-		protected MutableComponent createDescription(MobEffect effect) {
-        	return Component.translatable(effect.getDescriptionId());
+		protected MutableComponent createDescription(Holder<MobEffect> effect) {
+        	return Component.translatable(effect.value().getDescriptionId());
 		}
 
         @Override
@@ -247,7 +248,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         @Override
         public void onPress() {
-            PacketDistributor.SERVER.noArg().send(new ServerboundBadBeaconPacket(Optional.ofNullable(BadBeaconScreen.this.primaryEffect), Optional.ofNullable(BadBeaconScreen.this.secondaryEffect)));
+            PacketDistributor.sendToServer(new ServerboundBadBeaconPacket(Optional.ofNullable(BadBeaconScreen.this.primaryEffect), Optional.ofNullable(BadBeaconScreen.this.secondaryEffect)));
             BadBeaconScreen.this.minecraft.player.closeContainer();
         }
 
@@ -272,12 +273,12 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 	}
 
 	class UpgradeButton extends BadBeaconScreen.PowerButton {
-		public UpgradeButton(int x, int y, MobEffect effect) {
+		public UpgradeButton(int x, int y, Holder<MobEffect> effect) {
 			super(x, y, effect, false, 3);
 		}
 
-		protected MutableComponent createDescription(MobEffect effect) {
-			return (Component.translatable(effect.getDescriptionId())).append(" II");
+		protected MutableComponent createDescription(Holder<MobEffect> effect) {
+			return (Component.translatable(effect.value().getDescriptionId())).append(" II");
 		}
 
 		public void updateStatus(int id) {
