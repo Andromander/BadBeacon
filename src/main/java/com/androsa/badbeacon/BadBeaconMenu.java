@@ -2,12 +2,14 @@ package com.androsa.badbeacon;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -141,6 +143,7 @@ public class BadBeaconMenu extends AbstractContainerMenu {
             this.data.set(1, encodeEffect(primary.orElse(null)));
             this.data.set(2, encodeEffect(secondary.orElse(null)));
             this.beaconSlot.remove(1);
+            this.access.execute(Level::blockEntityChanged);
         }
     }
 

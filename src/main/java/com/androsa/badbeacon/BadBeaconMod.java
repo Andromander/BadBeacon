@@ -39,8 +39,8 @@ public class BadBeaconMod {
     private static final Logger LOGGER = LogManager.getLogger();
     public static BadBeaconConfig config;
 
-    public static final TagKey<Block> BAD_BEACON_BASE = BlockTags.create(new ResourceLocation(MODID, "bad_beacon_base"));
-    public static final TagKey<Item> BAD_BEACON_PAYMENT = ItemTags.create(new ResourceLocation(MODID, "bad_beacon_payment"));
+    public static final TagKey<Block> BAD_BEACON_BASE = BlockTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "bad_beacon_base"));
+    public static final TagKey<Item> BAD_BEACON_PAYMENT = ItemTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "bad_beacon_payment"));
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, MODID);

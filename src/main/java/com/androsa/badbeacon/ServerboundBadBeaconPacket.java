@@ -9,17 +9,18 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Optional;
 
 public record ServerboundBadBeaconPacket(Optional<Holder<MobEffect>> primaryEffect, Optional<Holder<MobEffect>> secondaryEffect) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<ServerboundBadBeaconPacket> ID = new Type<>(new ResourceLocation(BadBeaconMod.MODID, "update_bad_beacon"));
+    public static final CustomPacketPayload.Type<ServerboundBadBeaconPacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(BadBeaconMod.MODID, "update_bad_beacon"));
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundBadBeaconPacket> CODEC = StreamCodec.composite(
-            ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT).apply(ByteBufCodecs::optional),
+            MobEffect.STREAM_CODEC.apply(ByteBufCodecs::optional),
             ServerboundBadBeaconPacket::primaryEffect,
-            ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT).apply(ByteBufCodecs::optional),
+            MobEffect.STREAM_CODEC.apply(ByteBufCodecs::optional),
             ServerboundBadBeaconPacket::secondaryEffect,
             ServerboundBadBeaconPacket::new);
 
@@ -29,12 +30,12 @@ public record ServerboundBadBeaconPacket(Optional<Holder<MobEffect>> primaryEffe
     }
 
     public static void handle(final ServerboundBadBeaconPacket packet, IPayloadContext context) {
-        Player player = context.player();
-        if (player.containerMenu instanceof BadBeaconMenu) {
-            if (!player.containerMenu.stillValid(player)) {
+        AbstractContainerMenu menu = context.player().containerMenu;
+        if (menu instanceof BadBeaconMenu beacon) {
+            if (!menu.stillValid(context.player())) {
                 return;
             }
-            ((BadBeaconMenu)player.containerMenu).handleSlots(packet.primaryEffect(), packet.secondaryEffect());
+            beacon.handleSlots(packet.primaryEffect(), packet.secondaryEffect());
         }
     }
 }

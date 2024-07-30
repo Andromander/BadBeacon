@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
-    private static final ResourceLocation BEACON_GUI_TEXTURES = new ResourceLocation(BadBeaconMod.MODID, "textures/gui/container/beacon.png");
+    private static final ResourceLocation BEACON_GUI_TEXTURES = ResourceLocation.fromNamespaceAndPath(BadBeaconMod.MODID, "textures/gui/container/beacon.png");
     private static final Component PRIMARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.primary");
     private static final Component SECONDARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.secondary");
     private final List<BadBeaconButton> buttons = Lists.newArrayList();

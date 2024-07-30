@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 public class BadBeaconRenderer implements BlockEntityRenderer<BadBeaconBlockEntity> {
-    private static final ResourceLocation TEXTURE_BEACON_BEAM = new ResourceLocation("textures/entity/beacon_beam.png");
+    private static final ResourceLocation TEXTURE_BEACON_BEAM = ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png");
 
     public BadBeaconRenderer(BlockEntityRendererProvider.Context context) { }
 
@@ -25,13 +25,13 @@ public class BadBeaconRenderer implements BlockEntityRenderer<BadBeaconBlockEnti
 
         for(int segment = 0; segment < segments.size(); ++segment) {
             BadBeaconBlockEntity.BeamSegment beacontileentity$beamsegment = segments.get(segment);
-            renderSegments(stack, buffer, partialTicks, time, height, segment == segments.size() - 1 ? 1024 : beacontileentity$beamsegment.getHeight(), beacontileentity$beamsegment.getColors());
+            renderSegments(stack, buffer, partialTicks, time, height, segment == segments.size() - 1 ? 1024 : beacontileentity$beamsegment.getHeight(), beacontileentity$beamsegment.getColor());
             height += beacontileentity$beamsegment.getHeight();
         }
     }
 
-    private static void renderSegments(PoseStack matrix, MultiBufferSource buffer, float partialTicks, long time, int height, int segment, float[] colours) {
-        BeaconRenderer.renderBeaconBeam(matrix, buffer, TEXTURE_BEACON_BEAM, partialTicks, 1.0F, time, height, segment, colours, 0.2F, 0.25F);
+    private static void renderSegments(PoseStack matrix, MultiBufferSource buffer, float partialTicks, long time, int height, int segment, int color) {
+        BeaconRenderer.renderBeaconBeam(matrix, buffer, TEXTURE_BEACON_BEAM, partialTicks, 1.0F, time, height, segment, color, 0.2F, 0.25F);
     }
 
     @Override
