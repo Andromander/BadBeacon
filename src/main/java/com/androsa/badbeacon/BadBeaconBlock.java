@@ -21,8 +21,8 @@ import javax.annotation.Nullable;
 
 public class BadBeaconBlock extends Block implements EntityBlock, BeaconBeamBlock {
 
-    public BadBeaconBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.SNARE).strength(0.3F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
+    public BadBeaconBlock(Properties props) {
+        super(props.mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.SNARE).strength(0.3F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class BadBeaconBlock extends Block implements EntityBlock, BeaconBeamBloc
     @Override
     @Deprecated
     public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!worldIn.isClientSide) {
+        if (!worldIn.isClientSide()) {
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
             if (tileentity instanceof BadBeaconBlockEntity) {
                 player.openMenu((BadBeaconBlockEntity) tileentity);

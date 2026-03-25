@@ -1,8 +1,7 @@
 package com.androsa.badbeacon;
 
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -14,8 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -26,6 +23,8 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -39,17 +38,17 @@ public class BadBeaconMod {
     private static final Logger LOGGER = LogManager.getLogger();
     public static BadBeaconConfig config;
 
-    public static final TagKey<Block> BAD_BEACON_BASE = BlockTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "bad_beacon_base"));
-    public static final TagKey<Item> BAD_BEACON_PAYMENT = ItemTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "bad_beacon_payment"));
+    public static final TagKey<Block> BAD_BEACON_BASE = BlockTags.create(Identifier.fromNamespaceAndPath(MODID, "bad_beacon_base"));
+    public static final TagKey<Item> BAD_BEACON_PAYMENT = ItemTags.create(Identifier.fromNamespaceAndPath(MODID, "bad_beacon_payment"));
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, MODID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, MODID);
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MODID);
     public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(Registries.MENU, MODID);
 
-    public static final Supplier<Block> BAD_BEACON = BLOCKS.register("bad_beacon", BadBeaconBlock::new);
-    public static final Supplier<Item> BAD_BEACON_ITEM = ITEMS.register("bad_beacon", () -> new BlockItem(BAD_BEACON.get(), new Item.Properties().rarity(Rarity.RARE)));
-    public static final Supplier<BlockEntityType<BadBeaconBlockEntity>> BAD_BEACON_TILEENTITY = BLOCK_ENTITIES.register("bad_beacon_tileentity", () -> BlockEntityType.Builder.of(BadBeaconBlockEntity::new, BadBeaconMod.BAD_BEACON.get()).build(null));
+    public static final DeferredBlock<Block> BAD_BEACON = BLOCKS.registerBlock("bad_beacon", BadBeaconBlock::new);
+    public static final DeferredItem<Item> BAD_BEACON_ITEM = ITEMS.registerItem("bad_beacon", (props) -> new BlockItem(BAD_BEACON.get(), props.rarity(Rarity.RARE).useBlockDescriptionPrefix()));
+    public static final Supplier<BlockEntityType<BadBeaconBlockEntity>> BAD_BEACON_TILEENTITY = BLOCK_ENTITIES.register("bad_beacon_tileentity", () -> new BlockEntityType<>(BadBeaconBlockEntity::new, BadBeaconMod.BAD_BEACON.get()));
     public static final Supplier<MenuType<BadBeaconMenu>> BAD_BEACON_CONTAINER = CONTAINERS.register("bad_beacon_container", () -> new MenuType<>(BadBeaconMenu::new, FeatureFlags.VANILLA_SET));
 
     public BadBeaconMod(IEventBus bus, ModContainer container) {
@@ -69,7 +68,7 @@ public class BadBeaconMod {
     }
 
     public void clientSetup(final FMLClientSetupEvent e) {
-        BadBeaconMod.registerBinds();
+        BadBeaconClient.registerBinds();
     }
 
     public void registerPayload(final RegisterPayloadHandlersEvent event) {
@@ -85,11 +84,6 @@ public class BadBeaconMod {
 
     public void registerScreen(RegisterMenuScreensEvent event) {
         event.register(BAD_BEACON_CONTAINER.get(), BadBeaconScreen::new);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void registerBinds() {
-        BlockEntityRenderers.register(BAD_BEACON_TILEENTITY.get(), BadBeaconRenderer::new);
     }
 
     public static class BadBeaconConfig {

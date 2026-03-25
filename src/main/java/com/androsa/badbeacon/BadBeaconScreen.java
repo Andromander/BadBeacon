@@ -1,17 +1,18 @@
 package com.androsa.badbeacon;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -19,13 +20,19 @@ import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.List;
 import java.util.Optional;
 
 public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
-    private static final ResourceLocation BEACON_GUI_TEXTURES = ResourceLocation.fromNamespaceAndPath(BadBeaconMod.MODID, "textures/gui/container/beacon.png");
+    private static final Identifier BEACON_GUI_TEXTURES = Identifier.fromNamespaceAndPath(BadBeaconMod.MODID, "textures/gui/container/beacon.png");
+    static final Identifier BUTTON_DISABLED_SPRITE = Identifier.withDefaultNamespace("container/beacon/button_disabled");
+    static final Identifier BUTTON_SELECTED_SPRITE = Identifier.withDefaultNamespace("container/beacon/button_selected");
+    static final Identifier BUTTON_HIGHLIGHTED_SPRITE = Identifier.withDefaultNamespace("container/beacon/button_highlighted");
+    static final Identifier BUTTON_SPRITE = Identifier.withDefaultNamespace("container/beacon/button");
+    static final Identifier CONFIRM_SPRITE = Identifier.withDefaultNamespace("container/beacon/confirm");
+    static final Identifier CANCEL_SPRITE = Identifier.withDefaultNamespace("container/beacon/cancel");
     private static final Component PRIMARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.primary");
     private static final Component SECONDARY_EFFECT_NAME = Component.translatable("block.minecraft.beacon.secondary");
     private final List<BadBeaconButton> buttons = Lists.newArrayList();
@@ -53,8 +60,6 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     protected void init() {
         super.init();
         this.buttons.clear();
-        this.addButton(new BadBeaconScreen.ConfirmButton(this.leftPos + 164, this.topPos + 107));
-        this.addButton(new BadBeaconScreen.CancelButton(this.leftPos + 190, this.topPos + 107));
 
 		for(int tier = 0; tier <= 2; ++tier) {
 			int s1 = BadBeaconBlockEntity.EFFECTS_LIST.get(tier).size();
@@ -81,6 +86,8 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		BadBeaconScreen.PowerButton upgradebutton = new BadBeaconScreen.UpgradeButton(this.leftPos + 167 + (t3 - 1) * 24 - w2 / 2, this.topPos + 47, BeaconBlockEntity.BEACON_EFFECTS.getFirst().getFirst());
 		upgradebutton.visible = false;
 		this.addButton(upgradebutton);
+        this.addButton(new BadBeaconScreen.ConfirmButton(this.leftPos + 164, this.topPos + 107));
+        this.addButton(new BadBeaconScreen.CancelButton(this.leftPos + 190, this.topPos + 107));
     }
 
 	private <T extends AbstractWidget & BadBeaconScreen.BadBeaconButton> void addButton(T button) {
@@ -101,23 +108,20 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
 	@Override
     protected void renderLabels(GuiGraphics stack, int mouseX, int mouseY) {
-        stack.drawCenteredString(this.font, PRIMARY_EFFECT_NAME, 62, 10, 14737632);
-        stack.drawCenteredString(this.font, SECONDARY_EFFECT_NAME, 169, 10, 14737632);
+        stack.drawCenteredString(this.font, PRIMARY_EFFECT_NAME, 62, 10, -2039584);
+        stack.drawCenteredString(this.font, SECONDARY_EFFECT_NAME, 169, 10, -2039584);
     }
 
     @Override
     protected void renderBg(GuiGraphics stack, float partialTicks, int mouseX, int mouseY) {
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
-        stack.blit(BEACON_GUI_TEXTURES, x, y, 0, 0, this.imageWidth, this.imageHeight);
-        stack.pose().pushPose();
-        stack.pose().translate(0.0F, 0.0F, 100.0F);
+        stack.blit(RenderPipelines.GUI_TEXTURED, BEACON_GUI_TEXTURES, x, y, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
         stack.renderItem(new ItemStack(Items.COPPER_INGOT), x + 20, y + 109);
         stack.renderItem(new ItemStack(Items.COAL), x + 41, y + 109);
         stack.renderItem(new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
         stack.renderItem(new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
         stack.renderItem(new ItemStack(Items.QUARTZ), x + 42 + 66, y + 109);
-        stack.pose().popPose();
     }
 
     @Override
@@ -142,17 +146,19 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
         @Override
-        public void renderWidget(GuiGraphics stack, int backX, int backY, float partial) {
-            int j = 0;
+        public void renderContents(GuiGraphics stack, int backX, int backY, float partial) {
+            Identifier identifier;
             if (!this.active) {
-                j += this.width * 2;
+                identifier = BUTTON_DISABLED_SPRITE;
             } else if (this.selected) {
-                j += this.width * 1;
+                identifier = BUTTON_SELECTED_SPRITE;
             } else if (this.isHoveredOrFocused()) {
-                j += this.width * 3;
+                identifier = BUTTON_HIGHLIGHTED_SPRITE;
+            } else {
+                identifier = BUTTON_SPRITE;
             }
 
-            stack.blit(BadBeaconScreen.BEACON_GUI_TEXTURES, this.getX(), this.getY(), j, 219, this.width, this.height);
+            stack.blitSprite(RenderPipelines.GUI_TEXTURED, identifier, this.getX(), this.getY(), this.width, this.height);
             this.blitButton(stack);
         }
 
@@ -176,7 +182,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		private final boolean isPrimary;
 		protected final int tier;
         private Holder<MobEffect> effect;
-        private TextureAtlasSprite textureSprite;
+        private Identifier textureSprite;
 
         public PowerButton(int x, int y, Holder<MobEffect> effectIn, boolean primary, int tier) {
             super(x, y);
@@ -187,7 +193,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         protected void setEffect(Holder<MobEffect> effect) {
         	this.effect = effect;
-        	this.textureSprite = Minecraft.getInstance().getMobEffectTextures().get(effect);
+        	this.textureSprite = Gui.getMobEffectSprite(effect);
         	this.setTooltip(Tooltip.create(this.createDescription(effect), null));
 		}
 
@@ -196,7 +202,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
         @Override
-        public void onPress() {
+        public void onPress(InputWithModifiers input) {
             if (!this.isSelected()) {
                 if (this.isPrimary) {
                     BadBeaconScreen.this.primaryEffect = this.effect;
@@ -210,7 +216,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
         @Override
         protected void blitButton(GuiGraphics stack) {
-            stack.blit(this.getX() + 2, this.getY() + 2, 0, 18, 18, this.textureSprite);
+            stack.blitSprite(RenderPipelines.GUI_TEXTURED, this.textureSprite, this.getX() + 2, this.getY() + 2, 18, 18);
         }
 
 		@Override
@@ -226,29 +232,28 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 	}
 
     abstract static class SpriteButton extends BadBeaconScreen.Button {
-        private final int iconX;
-        private final int iconY;
+        private final Identifier sprite;
 
-        protected SpriteButton(int x, int y, int offsetX, int offsetY, Component component) {
+        protected SpriteButton(int x, int y, Identifier sprite, Component component) {
             super(x, y, component);
-            this.iconX = offsetX;
-            this.iconY = offsetY;
+            this.setTooltip(Tooltip.create(component));
+            this.sprite = sprite;
         }
 
         @Override
         protected void blitButton(GuiGraphics stack) {
-            stack.blit(BadBeaconScreen.BEACON_GUI_TEXTURES, this.getX() + 2, this.getY() + 2, this.iconX, this.iconY, 18, 18);
+            stack.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, this.getX() + 2, this.getY() + 2, 18, 18);
         }
 	}
 
     class ConfirmButton extends BadBeaconScreen.SpriteButton {
         public ConfirmButton(int x, int y) {
-            super(x, y, 90, 220, CommonComponents.GUI_DONE);
+            super(x, y, CONFIRM_SPRITE, CommonComponents.GUI_DONE);
         }
 
         @Override
-        public void onPress() {
-            PacketDistributor.sendToServer(new ServerboundBadBeaconPacket(Optional.ofNullable(BadBeaconScreen.this.primaryEffect), Optional.ofNullable(BadBeaconScreen.this.secondaryEffect)));
+        public void onPress(InputWithModifiers input) {
+            ClientPacketDistributor.sendToServer(new ServerboundBadBeaconPacket(Optional.ofNullable(BadBeaconScreen.this.primaryEffect), Optional.ofNullable(BadBeaconScreen.this.secondaryEffect)));
             BadBeaconScreen.this.minecraft.player.closeContainer();
         }
 
@@ -260,11 +265,11 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 
     class CancelButton extends BadBeaconScreen.SpriteButton {
         public CancelButton(int x, int y) {
-            super(x, y, 112, 220, CommonComponents.GUI_CANCEL);
+            super(x, y, CANCEL_SPRITE, CommonComponents.GUI_CANCEL);
         }
 
         @Override
-        public void onPress() {
+        public void onPress(InputWithModifiers input) {
             BadBeaconScreen.this.minecraft.player.closeContainer();
         }
 
