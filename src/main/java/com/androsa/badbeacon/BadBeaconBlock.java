@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 public class BadBeaconBlock extends Block implements EntityBlock, BeaconBeamBlock {
 
     public BadBeaconBlock(Properties props) {
-        super(props.mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.SNARE).strength(0.3F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
+        super(props.mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.SNARE).strength(3.0F).lightLevel((val) -> 15).noOcclusion().isRedstoneConductor((state, get, pos) -> false));
     }
 
     @Override

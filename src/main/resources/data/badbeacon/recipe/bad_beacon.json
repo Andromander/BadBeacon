@@ -10,14 +10,8 @@
     "BBB"
   ],
   "key": {
-    "#": {
-      "item": "minecraft:heart_of_the_sea"
-    },
-    "G": {
-      "item": "minecraft:glass"
-    },
-    "B": {
-      "item": "minecraft:nether_wart_block"
-    }
+    "#": "minecraft:heart_of_the_sea",
+    "G": "minecraft:glass",
+    "B": "minecraft:nether_wart_block"
   }
 }

@@ -2,7 +2,7 @@ package com.androsa.badbeacon;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -40,9 +40,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
     private Holder<MobEffect> secondaryEffect;
 
     public BadBeaconScreen(final BadBeaconMenu container, Inventory inventory, Component component) {
-        super(container, inventory, component);
-        this.imageWidth = 230;
-        this.imageHeight = 219;
+        super(container, inventory, component, 230, 219);
         container.addSlotListener(new ContainerListener() {
             @Override
             public void slotChanged(AbstractContainerMenu containerToSend, int slotInd, ItemStack stack) {
@@ -107,27 +105,21 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 	}
 
 	@Override
-    protected void renderLabels(GuiGraphics stack, int mouseX, int mouseY) {
-        stack.drawCenteredString(this.font, PRIMARY_EFFECT_NAME, 62, 10, -2039584);
-        stack.drawCenteredString(this.font, SECONDARY_EFFECT_NAME, 169, 10, -2039584);
+    protected void extractLabels(GuiGraphicsExtractor stack, int mouseX, int mouseY) {
+        stack.centeredText(this.font, PRIMARY_EFFECT_NAME, 62, 10, -2039584);
+        stack.centeredText(this.font, SECONDARY_EFFECT_NAME, 169, 10, -2039584);
     }
 
     @Override
-    protected void renderBg(GuiGraphics stack, float partialTicks, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor stack, int mouseX, int mouseY, float partialTicks) {
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
         stack.blit(RenderPipelines.GUI_TEXTURED, BEACON_GUI_TEXTURES, x, y, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
-        stack.renderItem(new ItemStack(Items.COPPER_INGOT), x + 20, y + 109);
-        stack.renderItem(new ItemStack(Items.COAL), x + 41, y + 109);
-        stack.renderItem(new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
-        stack.renderItem(new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
-        stack.renderItem(new ItemStack(Items.QUARTZ), x + 42 + 66, y + 109);
-    }
-
-    @Override
-    public void render(GuiGraphics stack, int mouseX, int mouseZ, float ticks) {
-        super.render(stack, mouseX, mouseZ, ticks);
-        this.renderTooltip(stack, mouseX, mouseZ);
+        stack.item(new ItemStack(Items.COPPER_INGOT), x + 20, y + 109);
+        stack.item(new ItemStack(Items.COAL), x + 41, y + 109);
+        stack.item(new ItemStack(Items.LAPIS_LAZULI), x + 41 + 22, y + 109);
+        stack.item(new ItemStack(Items.REDSTONE), x + 42 + 44, y + 109);
+        stack.item(new ItemStack(Items.QUARTZ), x + 42 + 66, y + 109);
     }
 
 	interface BadBeaconButton {
@@ -146,7 +138,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
 		}
 
         @Override
-        public void renderContents(GuiGraphics stack, int backX, int backY, float partial) {
+        protected void extractContents(GuiGraphicsExtractor stack, int backX, int backY, float partial) {
             Identifier identifier;
             if (!this.active) {
                 identifier = BUTTON_DISABLED_SPRITE;
@@ -162,7 +154,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
             this.blitButton(stack);
         }
 
-        protected abstract void blitButton(GuiGraphics stack);
+        protected abstract void blitButton(GuiGraphicsExtractor stack);
 
         public boolean isSelected() {
             return this.selected;
@@ -215,7 +207,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         }
 
         @Override
-        protected void blitButton(GuiGraphics stack) {
+        protected void blitButton(GuiGraphicsExtractor stack) {
             stack.blitSprite(RenderPipelines.GUI_TEXTURED, this.textureSprite, this.getX() + 2, this.getY() + 2, 18, 18);
         }
 
@@ -241,7 +233,7 @@ public class BadBeaconScreen extends AbstractContainerScreen<BadBeaconMenu> {
         }
 
         @Override
-        protected void blitButton(GuiGraphics stack) {
+        protected void blitButton(GuiGraphicsExtractor stack) {
             stack.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, this.getX() + 2, this.getY() + 2, 18, 18);
         }
 	}

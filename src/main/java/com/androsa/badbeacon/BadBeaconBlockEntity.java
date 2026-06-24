@@ -127,7 +127,7 @@ public class BadBeaconBlockEntity extends BlockEntity implements MenuProvider, N
                     }
                 }
             } else {
-                if (beaconBeamSegment == null || blockstate.getLightBlock() >= 15 && !blockstate.is(Blocks.BEDROCK)) {
+                if (beaconBeamSegment == null || blockstate.getLightDampening() >= 15 && !blockstate.is(Blocks.BEDROCK)) {
                     entity.checkSegments.clear();
                     entity.lastY = l;
                     break;
