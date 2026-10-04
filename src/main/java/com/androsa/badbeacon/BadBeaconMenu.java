@@ -2,6 +2,7 @@ package com.androsa.badbeacon;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffect;
@@ -57,7 +58,7 @@ public class BadBeaconMenu extends AbstractContainerMenu {
         if (!playerIn.level().isClientSide()) {
             ItemStack itemstack = this.beaconSlot.remove(this.beaconSlot.getSlotStackLimit());
             if (!itemstack.isEmpty()) {
-                playerIn.drop(itemstack, false);
+                playerIn.drop(itemstack, false, Prediction.SERVER_ONLY);
             }
         }
     }

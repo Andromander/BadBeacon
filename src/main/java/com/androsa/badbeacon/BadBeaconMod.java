@@ -63,7 +63,7 @@ public class BadBeaconMod {
         CONTAINERS.register(bus);
 
         final Pair<BadBeaconConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(BadBeaconConfig::new);
-        container.registerConfig(ModConfig.Type.COMMON, specPair.getRight());
+        container.registerConfig(ModConfig.Type.LOCAL, specPair.getRight());
         config = specPair.getLeft();
     }
 
